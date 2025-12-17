@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>For Movies</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    header, footer {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .movie {
+      background: #222;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+    button {
+      padding: 8px 12px;
+      background: #e50914;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Public Domain Movies</h1>
+  <p>Legally watch and download</p>
+</header>
+
+<div id="movies"></div>
+
+<footer>
+  <p>Disclaimer: All content is public domain</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
