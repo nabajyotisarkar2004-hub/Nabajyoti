@@ -12,32 +12,60 @@
     color: white;
     font-family: Arial, sans-serif;
     text-align: center;
-    overflow: hidden;
   }
+
   h1 { margin: 10px 0; }
-  #score { margin-bottom: 10px; }
+
+  #score {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
   canvas {
     background: #000;
     display: block;
     margin: auto;
     touch-action: none;
+    border: 2px solid #555;
+  }
+
+  .controls {
+    margin-top: 10px;
+  }
+
+  button {
+    padding: 8px 15px;
+    margin: 4px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    background: #e50914;
+    color: white;
   }
 </style>
 </head>
 
 <body>
+
 <h1>🐍 Snake Game</h1>
 <div id="score">Score: 0</div>
-<canvas id="game" width="300" height="300"></canvas>
+<canvas id="game" width="360" height="360"></canvas>
+
+<div class="controls">
+  <button onclick="pauseGame()">Pause</button>
+  <button onclick="resumeGame()">Resume</button>
+  <button onclick="restartGame()">Restart</button>
+</div>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-const box = 15;
+const box = 20; // BIGGER BOX SIZE
 let score = 0;
+let gameRunning = true;
 
-let snake = [{ x: 150, y: 150 }];
+let snake = [{ x: 180, y: 180 }];
 let direction = "RIGHT";
 
 let food = randomFood();
@@ -49,17 +77,47 @@ function randomFood() {
   };
 }
 
+// DRAW GRID
+function drawGrid() {
+  ctx.strokeStyle = "#222";
+  for (let i = 0; i <= canvas.width; i += box) {
+    ctx.beginPath();
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i, canvas.height);
+    ctx.stroke();
+  }
+  for (let i = 0; i <= canvas.height; i += box) {
+    ctx.beginPath();
+    ctx.moveTo(0, i);
+    ctx.lineTo(canvas.width, i);
+    ctx.stroke();
+  }
+}
+
 function draw() {
+  if (!gameRunning) return;
+
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Food
+  drawGrid();
+
+  // FOOD
   ctx.fillStyle = "red";
   ctx.fillRect(food.x, food.y, box, box);
 
-  // Snake
-  ctx.fillStyle = "lime";
-  snake.forEach(s => ctx.fillRect(s.x, s.y, box, box));
+  // SNAKE
+  snake.forEach((part, index) => {
+    ctx.fillStyle = index === 0 ? "lime" : "#00aa00";
+    ctx.fillRect(part.x, part.y, box, box);
+
+    // SNAKE FACE
+    if (index === 0) {
+      ctx.fillStyle = "black";
+      ctx.fillRect(part.x + 5, part.y + 5, 4, 4);
+      ctx.fillRect(part.x + 11, part.y + 5, 4, 4);
+    }
+  });
 
   let head = { ...snake[0] };
 
@@ -68,30 +126,31 @@ function draw() {
   if (direction === "UP") head.y -= box;
   if (direction === "DOWN") head.y += box;
 
-  // Eat food
+  // FOOD EAT
   if (head.x === food.x && head.y === food.y) {
     score++;
     document.getElementById("score").innerText = "Score: " + score;
-    navigator.vibrate?.(50);
+    navigator.vibrate?.(60);
     food = randomFood();
   } else {
     snake.pop();
   }
 
-  // Collision
+  // COLLISION
   if (
     head.x < 0 || head.y < 0 ||
     head.x >= canvas.width || head.y >= canvas.height ||
-    snake.some(s => s.x === head.x && s.y === head.y)
+    snake.some(p => p.x === head.x && p.y === head.y)
   ) {
     alert("Game Over! Score: " + score);
-    location.reload();
+    restartGame();
+    return;
   }
 
   snake.unshift(head);
 }
 
-// Keyboard controls
+// KEYBOARD CONTROLS
 document.addEventListener("keydown", e => {
   if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
   if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
@@ -99,7 +158,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
 });
 
-// ✅ SWIPE CONTROLS (FIXED)
+// ✅ FIXED SWIPE CONTROLS
 let startX = 0;
 let startY = 0;
 
@@ -122,6 +181,18 @@ canvas.addEventListener("touchend", e => {
     else if (diffY < -30 && direction !== "DOWN") direction = "UP";
   }
 }, { passive: true });
+
+// BUTTON CONTROLS
+function pauseGame() { gameRunning = false; }
+function resumeGame() { gameRunning = true; }
+function restartGame() {
+  score = 0;
+  snake = [{ x: 180, y: 180 }];
+  direction = "RIGHT";
+  food = randomFood();
+  gameRunning = true;
+  document.getElementById("score").innerText = "Score: 0";
+}
 
 setInterval(draw, 140);
 </script>
