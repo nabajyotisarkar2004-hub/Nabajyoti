@@ -13,6 +13,31 @@ const movies = [
     title: "The Little Shop of Horrors",
     year: 1960,
     link: "https://archive.org/details/TheLittleShopOfHorrors1960"
+  },
+  {
+    title: "Metropolis",
+    year: 1927,
+    link: "https://archive.org/details/Metropolis1927"
+  },
+  {
+    title: "His Girl Friday",
+    year: 1940,
+    link: "https://archive.org/details/his_girl_friday"
+  },
+  {
+    title: "Sherlock Holmes",
+    year: 1939,
+    link: "https://archive.org/details/sherlock_holmes_1939"
+  },
+  {
+    title: "Charade",
+    year: 1963,
+    link: "https://archive.org/details/Charade1963"
+  },
+  {
+    title: "The General",
+    year: 1926,
+    link: "https://archive.org/details/TheGeneral1926"
   }
 ];
 
