@@ -1,49 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>For Movies</title>
+  <meta charset="UTF-8">
+  <title>Mobile Game Zone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
       margin: 0;
-      padding: 20px;
-    }
-    header, footer {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
       text-align: center;
-      margin-bottom: 20px;
+      padding: 16px;
     }
-    .movie {
-      background: #222;
+    h1 {
+      margin-bottom: 10px;
+    }
+    .game {
+      background: #1e293b;
       padding: 15px;
-      margin: 10px 0;
-      border-radius: 8px;
+      margin: 12px 0;
+      border-radius: 10px;
     }
     button {
-      padding: 8px 12px;
-      background: #e50914;
-      color: white;
+      background: #22c55e;
       border: none;
-      border-radius: 5px;
+      padding: 10px 16px;
+      color: black;
+      font-size: 16px;
+      border-radius: 8px;
     }
   </style>
 </head>
-<<div id="movie-list"></div>
-<script src="script.js"></script>>
+<body>
 
-<header>
-  <h1>Public Domain Movies</h1>
-  <p>Legally watch and download</p>
-</header>
+<h1>🎮 Mobile Game Zone</h1>
+<p>Play games directly in your browser</p>
 
-<div id="movies"></div>
+<div class="game">
+  <h3>🐍 Snake Game</h3>
+  <button onclick="openGame('snake.html')">Play</button>
+</div>
 
-<footer>
-  <p>Disclaimer: All content is public domain</p>
-</footer>
+<div class="game">
+  <h3>❌⭕ Tic Tac Toe</h3>
+  <button onclick="openGame('tictactoe.html')">Play</button>
+</div>
 
-<script src="script.js"></script>
+<script>
+  function openGame(page) {
+    window.location.href = page;
+  }
+</script>
+
 </body>
 </html>
