@@ -1,130 +1,150 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Push Box Game</title>
-
+<title>📦 Push Box</title>
 <style>
-body {
-  background: black;
-  color: white;
-  text-align: center;
-  font-family: Arial;
-}
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#000;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}h1{margin:10px 0;}
 
-#game {
-  display: grid;
-  grid-template-columns: repeat(7, 40px);
-  grid-gap: 4px;
-  justify-content: center;
-  margin-top: 20px;
-}
+#info{ display:flex; gap:15px; margin-bottom:10px; }
 
-.cell {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #333;
-}
+button{ padding:10px 14px; background:#1e1e1e; color:#fff; border:none; border-radius:8px; font-size:14px; }
 
-.wall { background: #444; }
-.player { background: yellow; border-radius: 50%; }
-.box { background: brown; }
-.target { background: green; }
-.box.target { background: lime; }
+#game{ display:grid; gap:2px; background:#111; }
 
-.controls button {
-  font-size: 20px;
-  margin: 5px;
-  padding: 10px 15px;
-}
-</style>
+.cell{ width:28px; height:28px; background:#000; } .wall{background:#333;} .player{background:#0f0;} .box{background:#f00;} .target{background:#0044ff;} .box.target{background:#ff9900;}
+
+#controls{margin-top:10px;} </style>
+
 </head>
-
-<body>
-
-<h1>📦 Push Box</h1>
-
-<div id="game"></div>
-
-<div class="controls">
-  <button onclick="move(0,-1)">⬆️</button><br>
-  <button onclick="move(-1,0)">⬅️</button>
-  <button onclick="move(1,0)">➡️</button><br>
-  <button onclick="move(0,1)">⬇️</button>
-</div>
-
-<script>
-const map = [
-  "#######",
-  "#  .  #",
-  "#  B  #",
-  "#  P  #",
-  "#     #",
-  "#######"
+<body><h1>📦 Push Box</h1><div id="info">
+  <div>Level: <span id="level">1</span></div>
+  <div>Mode: <span id="mode">Normal</span></div>
+</div><div id="game"></div><div id="controls">
+  <button onclick="restartLevel()">🔄 Restart</button>
+  <button onclick="toggleDaily()">📅 Daily Challenge</button>
+  <button onclick="location.href='index.html'">🏠 Home</button>
+</div><script>
+/* LEVEL DATA */
+const levels = [
+[
+"#####",
+"#.@ #",
+"# $ #",
+"# . #",
+"#####"
+],
+[
+"######",
+"# .@ #",
+"# $$ #",
+"#    #",
+"######"
+]
 ];
 
-let grid = map.map(row => row.split(""));
-let px, py;
+const dailyLevels = [
+[
+"#####",
+"#@$.#",
+"#   #",
+"#####"
+],
+[
+"######",
+"# .@ #",
+"# $  #",
+"#  $ #",
+"######"
+]
+];
 
-function findPlayer() {
-  for (let y = 0; y < grid.length; y++) {
-    for (let x = 0; x < grid[y].length; x++) {
-      if (grid[y][x] === "P") {
-        px = x; py = y;
-      }
-    }
-  }
-}
+let currentLevel = 0;
+let grid = [];
+let player = {x:0,y:0};
+let dailyMode = false;
 
-function draw() {
-  const game = document.getElementById("game");
-  game.innerHTML = "";
+function loadLevel(){
+  const map = dailyMode ? getDailyLevel() : levels[currentLevel];
+  document.getElementById('level').textContent = dailyMode ? 'Daily' : currentLevel+1;
+  document.getElementById('mode').textContent = dailyMode ? 'Daily' : 'Normal';
+  grid = [];
+  document.getElementById('game').innerHTML='';
+  document.getElementById('game').style.gridTemplateColumns = `repeat(${map[0].length}, 28px)`;
 
-  grid.forEach(row => {
-    row.forEach(cell => {
-      const div = document.createElement("div");
-      div.className = "cell";
-
-      if (cell === "#") div.classList.add("wall");
-      if (cell === "P") div.classList.add("player");
-      if (cell === "B") div.classList.add("box");
-      if (cell === ".") div.classList.add("target");
-      if (cell === "*") {
-        div.classList.add("box");
-        div.classList.add("target");
-      }
-
-      game.appendChild(div);
+  map.forEach((row,y)=>{
+    [...row].forEach((c,x)=>{
+      const cell=document.createElement('div');
+      cell.classList.add('cell');
+      if(c=='#') cell.classList.add('wall');
+      if(c=='@'){cell.classList.add('player'); player={x,y};}
+      if(c=='$') cell.classList.add('box');
+      if(c=='.') cell.classList.add('target');
+      grid.push({x,y,cell,type:c});
+      document.getElementById('game').appendChild(cell);
     });
   });
 }
 
-function move(dx, dy) {
-  const nx = px + dx;
-  const ny = py + dy;
-  const nnx = px + dx * 2;
-  const nny = py + dy * 2;
-
-  if (grid[ny][nx] === "#" ) return;
-
-  if (grid[ny][nx] === "B" || grid[ny][nx] === "*") {
-    if (grid[nny][nnx] === " " || grid[nny][nnx] === ".") {
-      grid[nny][nnx] = grid[nny][nnx] === "." ? "*" : "B";
-      grid[ny][nx] = grid[ny][nx] === "*" ? "." : " ";
-    } else return;
-  }
-
-  grid[py][px] = grid[py][px] === "P" && map[py][px] === "." ? "." : " ";
-  px = nx; py = ny;
-  grid[py][px] = "P";
-
-  draw();
+function getCell(x,y){
+  return grid.find(c=>c.x==x && c.y==y);
 }
 
-findPlayer();
-draw();
-</script>
+function move(dx,dy){
+  const next=getCell(player.x+dx,player.y+dy);
+  if(!next || next.cell.classList.contains('wall')) return;
 
-</body>
+  if(next.cell.classList.contains('box')){
+    const push=getCell(player.x+dx*2,player.y+dy*2);
+    if(!push || push.cell.classList.contains('wall') || push.cell.classList.contains('box')) return;
+    push.cell.classList.add('box');
+    next.cell.classList.remove('box');
+  }
+
+  getCell(player.x,player.y).cell.classList.remove('player');
+  player.x+=dx; player.y+=dy;
+  getCell(player.x,player.y).cell.classList.add('player');
+  checkWin();
+}
+
+function checkWin(){
+  const targets = grid.filter(c=>c.type=='.');
+  if(targets.every(t=>t.cell.classList.contains('box'))){
+    setTimeout(()=>{
+      alert('Level Complete!');
+      if(!dailyMode){currentLevel=(currentLevel+1)%levels.length;}
+      loadLevel();
+    },100);
+  }
+}
+
+function restartLevel(){loadLevel();}
+
+function toggleDaily(){
+  dailyMode=!dailyMode;
+  loadLevel();
+}
+
+function getDailyLevel(){
+  const day=Math.floor(Date.now()/(1000*60*60*24));
+  return dailyLevels[day % dailyLevels.length];
+}
+
+window.addEventListener('keydown',e=>{
+  if(e.key=='ArrowUp') move(0,-1);
+  if(e.key=='ArrowDown') move(0,1);
+  if(e.key=='ArrowLeft') move(-1,0);
+  if(e.key=='ArrowRight') move(1,0);
+});
+
+loadLevel();
+</script></body>
 </html>
