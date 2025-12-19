@@ -146,5 +146,20 @@ window.addEventListener('keydown',e=>{
 });
 
 loadLevel();
-</script></body>
+</script>
+  <div class="controls">
+  <button onclick="move(0,-1)">⬆️</button>
+
+  <div>
+    <button onclick="move(-1,0)">⬅️</button>
+    <button onclick="move(1,0)">➡️</button>
+  </div>
+
+  <button onclick="move(0,1)">⬇️</button>
+
+  <br><br>
+
+  <button onclick="restartLevel()">🔄 Restart</button>
+  <button onclick="toggleDaily()">📅 Daily Challenge</button>
+</div></body>
 </html>
