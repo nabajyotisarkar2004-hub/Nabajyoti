@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Push Box Game</title>
+
+<style>
+body {
+  background: black;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+}
+
+#game {
+  display: grid;
+  grid-template-columns: repeat(7, 40px);
+  grid-gap: 4px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #333;
+}
+
+.wall { background: #444; }
+.player { background: yellow; border-radius: 50%; }
+.box { background: brown; }
+.target { background: green; }
+.box.target { background: lime; }
+
+.controls button {
+  font-size: 20px;
+  margin: 5px;
+  padding: 10px 15px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📦 Push Box</h1>
+
+<div id="game"></div>
+
+<div class="controls">
+  <button onclick="move(0,-1)">⬆️</button><br>
+  <button onclick="move(-1,0)">⬅️</button>
+  <button onclick="move(1,0)">➡️</button><br>
+  <button onclick="move(0,1)">⬇️</button>
+</div>
+
+<script>
+const map = [
+  "#######",
+  "#  .  #",
+  "#  B  #",
+  "#  P  #",
+  "#     #",
+  "#######"
+];
+
+let grid = map.map(row => row.split(""));
+let px, py;
+
+function findPlayer() {
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[y].length; x++) {
+      if (grid[y][x] === "P") {
+        px = x; py = y;
+      }
+    }
+  }
+}
+
+function draw() {
+  const game = document.getElementById("game");
+  game.innerHTML = "";
+
+  grid.forEach(row => {
+    row.forEach(cell => {
+      const div = document.createElement("div");
+      div.className = "cell";
+
+      if (cell === "#") div.classList.add("wall");
+      if (cell === "P") div.classList.add("player");
+      if (cell === "B") div.classList.add("box");
+      if (cell === ".") div.classList.add("target");
+      if (cell === "*") {
+        div.classList.add("box");
+        div.classList.add("target");
+      }
+
+      game.appendChild(div);
+    });
+  });
+}
+
+function move(dx, dy) {
+  const nx = px + dx;
+  const ny = py + dy;
+  const nnx = px + dx * 2;
+  const nny = py + dy * 2;
+
+  if (grid[ny][nx] === "#" ) return;
+
+  if (grid[ny][nx] === "B" || grid[ny][nx] === "*") {
+    if (grid[nny][nnx] === " " || grid[nny][nnx] === ".") {
+      grid[nny][nnx] = grid[nny][nnx] === "." ? "*" : "B";
+      grid[ny][nx] = grid[ny][nx] === "*" ? "." : " ";
+    } else return;
+  }
+
+  grid[py][px] = grid[py][px] === "P" && map[py][px] === "." ? "." : " ";
+  px = nx; py = ny;
+  grid[py][px] = "P";
+
+  draw();
+}
+
+findPlayer();
+draw();
+</script>
+
+</body>
+</html>
